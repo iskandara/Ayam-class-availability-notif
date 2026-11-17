@@ -1,0 +1,13 @@
+name: live-check-test
+on:
+  workflow_dispatch:   # manual only: tests whether GitHub can read the live page
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check subject page
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python check.py --digest

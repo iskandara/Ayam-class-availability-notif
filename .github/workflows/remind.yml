@@ -1,0 +1,24 @@
+name: daily-reminder
+on:
+  schedule:
+    # GitHub cron is UTC-only. These two times are 10:05am Melbourne in
+    # daylight saving (UTC+11) and in standard time (UTC+10); remind.py --gate
+    # keeps whichever one is actually 10am, so exactly one reminder a day.
+    - cron: "5 23 * * *"
+    - cron: "5 0 * * *"
+  workflow_dispatch:   # "Run workflow" button: sends a reminder right away
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send reminder
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python remind.py --gate
+          else
+            python remind.py
+          fi
